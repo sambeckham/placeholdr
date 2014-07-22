@@ -9,23 +9,40 @@ router.get('/:tags/:width/:height?', function(req, res) {
 		photo,
 		url;
 
-// s	small square 75x75
-// q	large square 150x150
-// t	thumbnail, 100 on longest side
-// m	small, 240 on longest side
-// n	small, 320 on longest side
-// -	medium, 500 on longest side
-// z	medium 640, 640 on longest side
-// c	medium 800, 800 on longest side†
-// b	large, 1024 on longest side*
+// url_sq : 75 square.
+// url_q : 150 square.
+
+// url_t : 100 on longest side.
+// url_s : 240 on longest side.
+// url_n : 320 on longest side.
+// url_m : 500 on longest side.
+// url_z : 640 on longest side.
+// url_c : 800 on longest side.
+// url_l : 1024 on longest side.
 
 	var Flickr = require("node-flickr"),
 		keys = {"api_key": "76616ca9d5565c4e97fd67e65d4b4ebd"},
-		flickr = new Flickr(keys);
+		flickr = new Flickr(keys),
+		properties = {
+			"tags": tags,
+			"sort": "relevance",
+			"content_type": 1,
+			"safe_search": 1,
+			"media": "photos",
+			"privacy_filter": 1,
+			"extras": "url_l",
+			"tag_mode": 'all'
+		};
 
-	flickr.get("photos.search", {"tags": tags}, function(result){
-	    photo = result.photos.photo[0];
-	    url = 'https://farm' + photo.farm + '.staticflickr.com/' + photo.server + '/' + photo.id + '_' + photo.secret + '_b.jpg';
+	flickr.get("photos.search", properties, function(result){
+		var i = 0;
+
+		// Make sure the photo has the required size
+	    while(!result.photos.photo[i].hasOwnProperty("url_l")) {
+	    	i++;
+	    }
+	    photo = result.photos.photo[i];
+	    url = photo.url_l;
 	    res.render('index', { image: url });
 	});
 });
