@@ -5,9 +5,10 @@ var flickr = require('../controllers/flickr');
 /* GET home page. */
 router.get('/:tags/:width/:height?', function(req, res) {
 	var tags = req.params.tags,
-		width = req.params.width,
-		height = req.params.height || width,
-		url = flickr.getPhoto(tags, 'url_l', function() {
+		width = parseInt(req.params.width),
+		height = parseInt(req.params.height) || width,
+		size = flickr.getSize(width, height),
+		url = flickr.getPhoto(tags, size, function() {
 			res.render('index', { image: this });
 		});
 });
